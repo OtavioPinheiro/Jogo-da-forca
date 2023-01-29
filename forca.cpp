@@ -1,8 +1,12 @@
 #include <iostream>
+#include <ostream>
 #include <string>
 #include <map>
 #include <vector>
 #include <clocale>
+#include <fstream>
+#include <ctime>
+#include <cstdlib>
 using namespace std;
 
 map<char, bool> chutou;
@@ -97,11 +101,47 @@ void fim_de_jogo(string palavra_secreta) {
     }
 }
 
+vector<string> le_arquivo() {
+    ifstream arquivo;
+    arquivo.open("palavras.txt");
+
+    if (arquivo.is_open()) {
+        int qtde_palavras = 0;
+        arquivo >> qtde_palavras;
+        vector<string> palavras;
+
+        for (int i = 0; i < qtde_palavras; i++) {
+            string palavra;
+            arquivo >> palavra;
+            palavras.push_back(palavra);
+        }
+        arquivo.close();
+        return palavras;
+    } else {
+        cout << "Não possível acessar o banco de palavras." << endl;
+        exit(0);
+    }
+}
+
+string sorteia_palavra(string palavra_secreta) {
+    vector<string> palavras = le_arquivo();
+    srand(time(NULL));
+    if (!palavras.empty()) {
+        int indice_sorteado = rand() % palavras.size();
+        palavra_secreta = palavras[indice_sorteado];
+        return palavra_secreta;
+    } else {
+        cout << "O banco de palavras está vazio!" << endl;
+        exit(0);
+    }
+}
+
 int main() {
     setlocale(LC_ALL, "Portuguese_Brazil");
-    string palavra_secreta = "MELANCIA";
+    string palavra_secreta;
 
     cabecalho();
+    palavra_secreta = sorteia_palavra(palavra_secreta);
 
     while(nao_acertou(palavra_secreta) && nao_enforcou()) {
         chutes_errados_info();
