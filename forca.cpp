@@ -95,10 +95,17 @@ void fim_de_jogo(string palavra_secreta) {
     cout << "A palavra secreta era: " << palavra_secreta << endl;
     if (nao_acertou(palavra_secreta)) {
         wcout << L"Você perdeu! Tente novamente!" << endl;
+        cout << endl;
     }
     else {
         wcout << L"Parabéns! Você acertou a palavra secreta!" << endl;
+        cout << endl;
     }
+}
+
+void mensagem_de_erro() {
+    cout << "Não possível acessar o banco de palavras." << endl;
+    exit(0);
 }
 
 vector<string> le_arquivo() {
@@ -118,8 +125,7 @@ vector<string> le_arquivo() {
         arquivo.close();
         return palavras;
     } else {
-        cout << "Não possível acessar o banco de palavras." << endl;
-        exit(0);
+        mensagem_de_erro();
     }
 }
 
@@ -133,6 +139,44 @@ string sorteia_palavra(string palavra_secreta) {
     } else {
         cout << "O banco de palavras está vazio!" << endl;
         exit(0);
+    }
+}
+
+void salvar_arquivo(vector<string> nova_lista_palavras) {
+    ofstream arquivo;
+    arquivo.open("palavras.txt");
+    if(arquivo.is_open()) {
+        arquivo << nova_lista_palavras.size() << endl;
+        for (string palavra : nova_lista_palavras) {
+            arquivo << palavra << endl;
+        }
+        arquivo.close();
+    } else {
+        mensagem_de_erro();
+    }
+}
+
+void adicionar_palavra() {
+    char res;
+    wcout << L"Você quer adicionar uma palavra nova no banco de palavras?(s/n) ";
+    cin >> res;
+    if (res == 's') {
+        wcout << L"Digite a nova palavra usando letras maiúsculas!" << endl;
+        string nova_palavra;
+        cin >> nova_palavra;
+
+        vector<string> lista_palavras = le_arquivo();
+        lista_palavras.push_back(nova_palavra);
+
+        salvar_arquivo(lista_palavras);
+
+        cout << "Palavra adicionada no banco da palavras com sucesso!" << endl;
+        wcout << L"Encerrando o jogo. Obrigado por jogar! Até a próxima!" << endl;
+    } else if (res == 'n') {
+        wcout << L"Encerrando o jogo. Obrigado por jogar! Até a próxima!" << endl;
+    } else {
+        wcout << L"Digite s para Sim ou n para Não" << endl;
+        adicionar_palavra();
     }
 }
 
@@ -153,4 +197,5 @@ int main() {
         verifica_se_acertou(chute, palavra_secreta);
     }
     fim_de_jogo(palavra_secreta);
+    adicionar_palavra();
 }
